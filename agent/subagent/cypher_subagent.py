@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from model import build_openrouter_model
-
+from system_prompt import cypher_system_prompt
 load_dotenv()
 
 
@@ -28,28 +28,6 @@ def execute_cypher(cypher_query: str) -> str:
     except Exception as e:
         return f"ERROR: {str(e)}"
 
-SCHEMA_PATH = Path(__file__).resolve().parents[1] / "neo_4j.schema.md"
-SCHEMA = SCHEMA_PATH.read_text(encoding="utf-8")
-
-cypher_system_prompt = f"""You are a Cypher expert for Neo4j.
-
-DATABASE SCHEMA:
-{SCHEMA}
-
-TASK:
-1. Analyze the natural language question
-2. Generate EXACTLY ONE valid Cypher query to answer it
-3. IMMEDIATELY call `execute_cypher` with your query
-4. After tool result, respond in this EXACT format:
-
-CYPHER_QUERY: ```cypher [your query here]```
-RESULTS: [paste tool output h`ere]
-
-RULES:
-If question unrelated to schema: return "NO RELEVANT QUERY"
-If query impossible: return "NO RELEVANT QUERY"
-Always return Just the query + results + one line reasoning.
-Use LIMIT 10 for broad queries unless otherwise specified"""
 def get_cypher_middleware():
     return SubAgentMiddleware(
         default_model=build_openrouter_model(),
