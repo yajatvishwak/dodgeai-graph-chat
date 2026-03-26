@@ -82,9 +82,7 @@
   }
 
   async function loadInitialGraph() {
-    const apiBase =
-      import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-    const response = await fetch(`${apiBase}/api/graph?limit=50`);
+    const response = await fetch("/api/graph?limit=50");
     if (!response.ok) {
       throw new Error(`Graph API returned ${response.status}`);
     }

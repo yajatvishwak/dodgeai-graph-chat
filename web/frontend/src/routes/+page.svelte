@@ -14,8 +14,6 @@
   } from "$lib/stores/chat";
   import type { GraphDataPayload } from "$lib/types";
 
-  const apiBase = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
-
   $: currentMessages = $messages;
   $: currentGraph = $graphData;
   $: selectedNode = currentGraph.nodes.find((n) => n.id === $selectedNodeId) ?? null;
@@ -31,7 +29,7 @@
         role: m.role,
         content: m.content
       }));
-      const response = await fetch(`${apiBase}/api/chat`, {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, history })
