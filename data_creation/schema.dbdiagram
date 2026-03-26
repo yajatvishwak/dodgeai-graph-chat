@@ -1,0 +1,379 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "billing_document_headers",
+      "schemaName": "public",
+      "x": 375.44287109375,
+      "y": 50
+    },
+    {
+      "name": "billing_document_cancellations",
+      "schemaName": "public",
+      "x": 0,
+      "y": 50
+    },
+    {
+      "name": "billing_document_items",
+      "schemaName": "public",
+      "x": 833.15087890625,
+      "y": 50
+    },
+    {
+      "name": "business_partners",
+      "schemaName": "public",
+      "x": 0,
+      "y": 580
+    },
+    {
+      "name": "business_partner_addresses",
+      "schemaName": "public",
+      "x": 1223.6884765625,
+      "y": 50
+    },
+    {
+      "name": "customer_company_assignments",
+      "schemaName": "public",
+      "x": 375.44287109375,
+      "y": 580
+    },
+    {
+      "name": "customer_sales_area_assignments",
+      "schemaName": "public",
+      "x": 833.15087890625,
+      "y": 420
+    },
+    {
+      "name": "sales_order_headers",
+      "schemaName": "public",
+      "x": 0,
+      "y": 1946
+    },
+    {
+      "name": "sales_order_items",
+      "schemaName": "public",
+      "x": 375.44287109375,
+      "y": 1914
+    },
+    {
+      "name": "sales_order_schedule_lines",
+      "schemaName": "public",
+      "x": 833.15087890625,
+      "y": 2202
+    },
+    {
+      "name": "outbound_delivery_headers",
+      "schemaName": "public",
+      "x": 0,
+      "y": 1270
+    },
+    {
+      "name": "outbound_delivery_items",
+      "schemaName": "public",
+      "x": 375.44287109375,
+      "y": 1078
+    },
+    {
+      "name": "products",
+      "schemaName": "public",
+      "x": 1223.6884765625,
+      "y": 2088
+    },
+    {
+      "name": "product_descriptions",
+      "schemaName": "public",
+      "x": 0,
+      "y": 1768
+    },
+    {
+      "name": "product_plants",
+      "schemaName": "public",
+      "x": 375.44287109375,
+      "y": 1544
+    },
+    {
+      "name": "plants",
+      "schemaName": "public",
+      "x": 1223.6884765625,
+      "y": 1558
+    },
+    {
+      "name": "journal_entry_items_accounts_receivable",
+      "schemaName": "public",
+      "x": 1223.6884765625,
+      "y": 772
+    },
+    {
+      "name": "payments_accounts_receivable",
+      "schemaName": "public",
+      "x": 833.15087890625,
+      "y": 1110
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": [
+    {
+      "firstFieldNames": [
+        "billingDocument"
+      ],
+      "firstTableName": "billing_document_items",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "billingDocument"
+      ],
+      "secondTableName": "billing_document_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "soldToParty"
+      ],
+      "firstTableName": "billing_document_headers",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "businessPartner"
+      ],
+      "secondTableName": "business_partners",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "billingDocument"
+      ],
+      "firstTableName": "billing_document_cancellations",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "billingDocument"
+      ],
+      "secondTableName": "billing_document_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "cancelledBillingDocument"
+      ],
+      "firstTableName": "billing_document_cancellations",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "billingDocument"
+      ],
+      "secondTableName": "billing_document_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "salesOrder"
+      ],
+      "firstTableName": "sales_order_items",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "salesOrder"
+      ],
+      "secondTableName": "sales_order_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "soldToParty"
+      ],
+      "firstTableName": "sales_order_headers",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "businessPartner"
+      ],
+      "secondTableName": "business_partners",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "salesOrder",
+        "salesOrderItem"
+      ],
+      "firstTableName": "sales_order_schedule_lines",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "salesOrder",
+        "salesOrderItem"
+      ],
+      "secondTableName": "sales_order_items",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "deliveryDocument"
+      ],
+      "firstTableName": "outbound_delivery_items",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "deliveryDocument"
+      ],
+      "secondTableName": "outbound_delivery_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "referenceSdDocument",
+        "referenceSdDocumentItem"
+      ],
+      "firstTableName": "outbound_delivery_items",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "salesOrder",
+        "salesOrderItem"
+      ],
+      "secondTableName": "sales_order_items",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "product"
+      ],
+      "firstTableName": "product_descriptions",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "product"
+      ],
+      "secondTableName": "products",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "product"
+      ],
+      "firstTableName": "product_plants",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "product"
+      ],
+      "secondTableName": "products",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "plant"
+      ],
+      "firstTableName": "product_plants",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "plant"
+      ],
+      "secondTableName": "plants",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "referenceDocument"
+      ],
+      "firstTableName": "journal_entry_items_accounts_receivable",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "billingDocument"
+      ],
+      "secondTableName": "billing_document_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "customer"
+      ],
+      "firstTableName": "journal_entry_items_accounts_receivable",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "businessPartner"
+      ],
+      "secondTableName": "business_partners",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "customer"
+      ],
+      "firstTableName": "payments_accounts_receivable",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "businessPartner"
+      ],
+      "secondTableName": "business_partners",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "invoiceReference"
+      ],
+      "firstTableName": "payments_accounts_receivable",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "billingDocument"
+      ],
+      "secondTableName": "billing_document_headers",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "businessPartner"
+      ],
+      "firstTableName": "business_partner_addresses",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "businessPartner"
+      ],
+      "secondTableName": "business_partners",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+Table billing_document_headers {
+  accountingDocument bigint [not null]
+  billingDocument bigint [pk, not null]
+  billingDocumentDate timestamptz [not null]
+  billingDocumentIsCancelled boolean [not null]
+  billingDocumentType text [not null]
+  cancelledBillingDocument bigint
+  companyCode text [not null]
+  creationDateTime timestamptz
+  fiscalYear bigint [not null]
+  lastChangeDateTime timestamptz [not null]
+  soldToParty bigint [not null]
+  totalNetAmount numeric [not null]
+  transactionCurrency text [not null]
+}
+
+Table billing_document_cancellations {
+  accountingDocument bigint [not null]
+  billingDocument bigint [pk, not null]
+  billingDocumentDate timestamptz [not null]
+  billingDocumentIsCancelled boolean [not null]
+  billingDocumentType text [not null]
+  cancelledBillingDocument bigint
+  companyCode text [not null]
+  creationDateTime timestamptz
+  fiscalYear bigint [not null]
+  lastChangeDateTime timestamptz [not null]
+  soldToParty bigint [not null]
+  totalNetAmount numeric [not null]
+  transactionCurrency text [not null]
+}
+
+Table billing_document_items {
+  billingDocument bigint [not null]
+  billingDocumentItem bigint [not null]
+  billingQuantity text [not null]
+  billingQuantityUnit text [not null]
+  material text [not null]
+  netAmount text [not null]
+  referenceSdDocument bigint [not null]
+  referenceSdDocumentItem bigint [not null]
+  transactionCurrency text [not null]
+
+  indexes {
+    (billingDocument, billingDocumentItem) [pk]
+  }
+}
+
+Table business_partners {
+  businessPartner bigint [pk, not null]
+  businessPartnerCategory bigint [not null]
+  businessPartnerFullName text [not null]
+  businessPartnerGrouping text [not null]
+  businessPartnerIsBlocked boolean [not null]
+  businessPartnerName text [not null]
+  correspondenceLanguage text
+  createdByUser text [not null]
+  creationDateTime timestamptz
+  customer bigint [not null]
+  firstName text
+  formOfAddress bigint [not null]
+  industry text
+  isMarkedForArchiving boolean [not null]
+  lastChangeDate timestamptz [not null]
+  lastName text
+  organizationBpName1 text [not null]
+  organizationBpName2 text
+}
+
+Table business_partner_addresses {
+  addressId bigint [not null]
+  businessPartner bigint [not null]
+  addressTimeZone text [not null]
+  addressUuid text [not null]
+  cityName text
+  country text [not null]
+  postalCode bigint
+  region text [not null]
+  streetName text
+  validityEndDate timestamptz [not null]
+  validityStartDate timestamptz [not null]
+
+  indexes {
+    (addressId, businessPartner) [pk]
+  }
+}
+
+Table customer_company_assignments {
+  companyCode text [not null]
+  customer bigint [not null]
+  customerAccountGroup text [not null]
+  reconciliationAccount bigint [not null]
+
+  indexes {
+    (companyCode, customer) [pk]
+  }
+}
+
+Table customer_sales_area_assignments {
+  customer bigint [not null]
+  salesOrganization text [not null]
+  distributionChannel text [not null]
+  division bigint [not null]
+  currency text [not null]
+  customerPaymentTerms text [not null]
+
+  indexes {
+    (customer, salesOrganization, distributionChannel, division) [pk]
+  }
+}
+
+Table sales_order_headers {
+  salesOrder bigint [pk, not null]
+  createdByUser text [not null]
+  creationDate timestamptz [not null]
+  lastChangeDateTime timestamptz [not null]
+  salesOrganization text [not null]
+  distributionChannel bigint [not null]
+  organizationDivision bigint [not null]
+  soldToParty bigint [not null]
+  totalNetAmount numeric [not null]
+  transactionCurrency text [not null]
+}
+
+Table sales_order_items {
+  salesOrder bigint [not null]
+  salesOrderItem bigint [not null]
+  material text [not null]
+  productionPlant text [not null]
+  netAmount text [not null]
+
+  indexes {
+    (salesOrder, salesOrderItem) [pk]
+  }
+}
+
+Table sales_order_schedule_lines {
+  salesOrder bigint [not null]
+  salesOrderItem bigint [not null]
+  scheduleLine text [not null]
+  confirmedDeliveryDate timestamptz
+
+  indexes {
+    (salesOrder, salesOrderItem, scheduleLine) [pk]
+  }
+}
+
+Table outbound_delivery_headers {
+  deliveryDocument bigint [pk, not null]
+  creationDateTime timestamptz [not null]
+  actualGoodsMovementDateTime timestamptz
+  shippingPoint text [not null]
+  overallGoodsMovementStatus text [not null]
+}
+
+Table outbound_delivery_items {
+  deliveryDocument bigint [not null]
+  deliveryDocumentItem bigint [not null]
+  referenceSdDocument bigint [not null]
+  referenceSdDocumentItem bigint [not null]
+  plant text [not null]
+
+  indexes {
+    (deliveryDocument, deliveryDocumentItem) [pk]
+  }
+}
+
+Table products {
+  product text [pk, not null]
+  productType text [not null]
+  creationDate timestamptz [not null]
+}
+
+Table product_descriptions {
+  product text [not null]
+  language text [not null]
+  productDescription text [not null]
+
+  indexes {
+    (product, language) [pk]
+  }
+}
+
+Table product_plants {
+  product text [not null]
+  plant text [not null]
+  profitCenter text [not null]
+
+  indexes {
+    (product, plant) [pk]
+  }
+}
+
+Table plants {
+  plant text [pk, not null]
+  plantName text [not null]
+}
+
+Table journal_entry_items_accounts_receivable {
+  accountingDocument bigint [not null]
+  companyCode text [not null]
+  fiscalYear bigint [not null]
+  customer bigint [not null]
+  referenceDocument bigint [not null]
+  amountInTransactionCurrency numeric [not null]
+
+  indexes {
+    (accountingDocument, companyCode, fiscalYear) [pk]
+  }
+}
+
+Table payments_accounts_receivable {
+  accountingDocument bigint [not null]
+  companyCode text [not null]
+  customer bigint [not null]
+  invoiceReference bigint
+  amountInTransactionCurrency numeric [not null]
+
+  indexes {
+    (accountingDocument, companyCode) [pk]
+  }
+}
+
+//////////////////////////////////////////////////
+// Relationships
+//////////////////////////////////////////////////
+
+Ref: billing_document_items.billingDocument > billing_document_headers.billingDocument
+Ref: billing_document_headers.soldToParty > business_partners.businessPartner
+Ref: billing_document_cancellations.billingDocument > billing_document_headers.billingDocument
+Ref: billing_document_cancellations.cancelledBillingDocument > billing_document_headers.billingDocument
+
+Ref: sales_order_items.salesOrder > sales_order_headers.salesOrder
+Ref: sales_order_headers.soldToParty > business_partners.businessPartner
+Ref: sales_order_schedule_lines.(salesOrder, salesOrderItem) > sales_order_items.(salesOrder, salesOrderItem)
+
+Ref: outbound_delivery_items.deliveryDocument > outbound_delivery_headers.deliveryDocument
+Ref: outbound_delivery_items.(referenceSdDocument, referenceSdDocumentItem) > sales_order_items.(salesOrder, salesOrderItem)
+
+Ref: product_descriptions.product > products.product
+Ref: product_plants.product > products.product
+Ref: product_plants.plant > plants.plant
+
+Ref: journal_entry_items_accounts_receivable.referenceDocument > billing_document_headers.billingDocument
+Ref: journal_entry_items_accounts_receivable.customer > business_partners.businessPartner
+
+Ref: payments_accounts_receivable.customer > business_partners.businessPartner
+Ref: payments_accounts_receivable.invoiceReference > billing_document_headers.billingDocument
+
+Ref: business_partner_addresses.businessPartner > business_partners.businessPartner
