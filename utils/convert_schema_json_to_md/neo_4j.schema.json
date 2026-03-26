@@ -1,0 +1,329 @@
+[
+  {
+    "node": "Address",
+    "attributes": [
+      "country",
+      "city",
+      "street",
+      "postalCode",
+      "validFrom",
+      "region",
+      "validTo",
+      "addressId"
+    ],
+    "relations": [
+      {
+        "relationship": "HAS_ADDRESS",
+        "direction": "in",
+        "target": ["Customer"]
+      }
+    ]
+  },
+  {
+    "node": "BillingDocument",
+    "attributes": [
+      "companyCode",
+      "billingDate",
+      "isCancelled",
+      "billingDocumentId",
+      "totalNetAmount",
+      "billingType",
+      "currency",
+      "cancelledBillingDocumentId"
+    ],
+    "relations": [
+      {
+        "relationship": "RECORDS",
+        "direction": "in",
+        "target": ["JournalEntry"]
+      },
+      {
+        "relationship": "HAS_BILLING_ITEM",
+        "direction": "out",
+        "target": ["BillingItem"]
+      },
+      {
+        "relationship": "BILLED_TO",
+        "direction": "in",
+        "target": ["Customer"]
+      },
+      {
+        "relationship": "INVOICES",
+        "direction": "out",
+        "target": ["Product"]
+      }
+    ]
+  },
+  {
+    "node": "BillingItem",
+    "attributes": [
+      "quantity",
+      "billingDocumentId",
+      "billingItemId",
+      "productId",
+      "netAmount",
+      "billingItemUid"
+    ],
+    "relations": [
+      {
+        "relationship": "REFERENCES_PRODUCT",
+        "direction": "out",
+        "target": ["Product"]
+      },
+      {
+        "relationship": "HAS_BILLING_ITEM",
+        "direction": "in",
+        "target": ["BillingDocument"]
+      }
+    ]
+  },
+  {
+    "node": "Customer",
+    "attributes": [
+      "companyCode",
+      "division",
+      "isBlocked",
+      "customerId",
+      "fullName",
+      "currency",
+      "distributionChannel",
+      "grouping",
+      "salesOrganization",
+      "paymentTerms"
+    ],
+    "relations": [
+      {
+        "relationship": "HAS_JOURNAL_ENTRY",
+        "direction": "out",
+        "target": ["JournalEntry"]
+      },
+      {
+        "relationship": "BILLED_TO",
+        "direction": "out",
+        "target": ["BillingDocument"]
+      },
+      {
+        "relationship": "PLACED",
+        "direction": "out",
+        "target": ["SalesOrder"]
+      },
+      {
+        "relationship": "HAS_ADDRESS",
+        "direction": "out",
+        "target": ["Address"]
+      },
+      {
+        "relationship": "MADE_PAYMENT",
+        "direction": "out",
+        "target": ["Payment"]
+      }
+    ]
+  },
+  {
+    "node": "Delivery",
+    "attributes": [
+      "goodsMovementStatus",
+      "deliveryId",
+      "deliveryDate",
+      "shippingPoint"
+    ],
+    "relations": [
+      {
+        "relationship": "DISPATCHED_FROM",
+        "direction": "out",
+        "target": ["Plant"]
+      },
+      {
+        "relationship": "HAS_DELIVERY_ITEM",
+        "direction": "out",
+        "target": ["DeliveryItem"]
+      },
+      {
+        "relationship": "FULFILLS",
+        "direction": "out",
+        "target": ["SalesOrder"]
+      },
+      {
+        "relationship": "SHIPS",
+        "direction": "out",
+        "target": ["Product"]
+      }
+    ]
+  },
+  {
+    "node": "DeliveryItem",
+    "attributes": [
+      "deliveryItemUid",
+      "plantId",
+      "deliveryId",
+      "deliveryItemId",
+      "productId"
+    ],
+    "relations": [
+      {
+        "relationship": "REFERENCES_PRODUCT",
+        "direction": "out",
+        "target": ["Product"]
+      },
+      {
+        "relationship": "REFERENCES_PLANT",
+        "direction": "out",
+        "target": ["Plant"]
+      },
+      {
+        "relationship": "HAS_DELIVERY_ITEM",
+        "direction": "in",
+        "target": ["Delivery"]
+      }
+    ]
+  },
+  {
+    "node": "JournalEntry",
+    "attributes": [
+      "companyCode",
+      "amountTransactionCurrency",
+      "journalEntryId",
+      "fiscalYear"
+    ],
+    "relations": [
+      {
+        "relationship": "RECORDS",
+        "direction": "out",
+        "target": ["BillingDocument"]
+      },
+      {
+        "relationship": "HAS_JOURNAL_ENTRY",
+        "direction": "in",
+        "target": ["Customer"]
+      }
+    ]
+  },
+  {
+    "node": "Payment",
+    "attributes": ["companyCode", "amountTransactionCurrency", "paymentId"],
+    "relations": [
+      {
+        "relationship": "MADE_PAYMENT",
+        "direction": "in",
+        "target": ["Customer"]
+      }
+    ]
+  },
+  {
+    "node": "Plant",
+    "attributes": ["plantId", "plantName"],
+    "relations": [
+      {
+        "relationship": "REFERENCES_PLANT",
+        "direction": "in",
+        "target": ["SalesOrderItem", "DeliveryItem"]
+      },
+      {
+        "relationship": "DISPATCHED_FROM",
+        "direction": "in",
+        "target": ["Delivery"]
+      },
+      {
+        "relationship": "SOURCED_FROM",
+        "direction": "in",
+        "target": ["SalesOrder"]
+      },
+      {
+        "relationship": "STOCKED_AT",
+        "direction": "in",
+        "target": ["Product"]
+      }
+    ]
+  },
+  {
+    "node": "Product",
+    "attributes": ["profitCenter", "productId", "productName", "productType"],
+    "relations": [
+      {
+        "relationship": "INCLUDES",
+        "direction": "in",
+        "target": ["SalesOrder"]
+      },
+      {
+        "relationship": "REFERENCES_PRODUCT",
+        "direction": "in",
+        "target": ["SalesOrderItem", "DeliveryItem", "BillingItem"]
+      },
+      {
+        "relationship": "SHIPS",
+        "direction": "in",
+        "target": ["Delivery"]
+      },
+      {
+        "relationship": "INVOICES",
+        "direction": "in",
+        "target": ["BillingDocument"]
+      },
+      {
+        "relationship": "STOCKED_AT",
+        "direction": "out",
+        "target": ["Plant"]
+      }
+    ]
+  },
+  {
+    "node": "SalesOrder",
+    "attributes": ["salesOrderId", "currency", "orderDate", "totalNetAmount"],
+    "relations": [
+      {
+        "relationship": "FULFILLS",
+        "direction": "in",
+        "target": ["Delivery"]
+      },
+      {
+        "relationship": "HAS_SALE_ITEM",
+        "direction": "out",
+        "target": ["SalesOrderItem"]
+      },
+      {
+        "relationship": "SOURCED_FROM",
+        "direction": "out",
+        "target": ["Plant"]
+      },
+      {
+        "relationship": "INCLUDES",
+        "direction": "out",
+        "target": ["Product"]
+      },
+      {
+        "relationship": "PLACED",
+        "direction": "in",
+        "target": ["Customer"]
+      }
+    ]
+  },
+  {
+    "node": "SalesOrderItem",
+    "attributes": [
+      "salesOrderItemUid",
+      "salesOrderId",
+      "productId",
+      "netAmount",
+      "plantId",
+      "salesOrderItemId",
+      "confirmedDeliveryDate"
+    ],
+    "relations": [
+      {
+        "relationship": "REFERENCES_PRODUCT",
+        "direction": "out",
+        "target": ["Product"]
+      },
+      {
+        "relationship": "REFERENCES_PLANT",
+        "direction": "out",
+        "target": ["Plant"]
+      },
+      {
+        "relationship": "HAS_SALE_ITEM",
+        "direction": "in",
+        "target": ["SalesOrder"]
+      }
+    ]
+  }
+]
