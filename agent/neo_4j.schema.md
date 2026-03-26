@@ -42,3 +42,26 @@ SalesOrder      -[:SOURCED_FROM]---------> Plant
 SalesOrderItem  -[:REFERENCES_PLANT]-----> Plant
 SalesOrderItem  -[:REFERENCES_PRODUCT]---> Product
 ```
+
+## IDENTITY MAP (CRITICAL)
+
+Each node has a unique identifier property:
+
+- Address → addressId
+- BillingDocument → billingDocumentId
+- BillingItem → billingItemId
+- Customer → customerId
+- Delivery → deliveryId
+- DeliveryItem → deliveryItemId
+- JournalEntry → journalEntryId
+- Payment → paymentId
+- Plant → plantId
+- Product → productId
+- SalesOrder → salesOrderId
+- SalesOrderItem → salesOrderItemId
+
+IMPORTANT:
+
+- IDs are NOT interchangeable across node types
+- Same numeric value may appear in multiple node types
+- You MUST validate which node actually exists before using it
