@@ -2,6 +2,11 @@ from langchain_core.tools import tool
 from deepagents.middleware.subagents import SubAgentMiddleware
 from neo4j import GraphDatabase
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+from model import build_openrouter_model
+
+load_dotenv()
 
 
 NEO4J_URI = os.getenv("NEO4J_URI") 
@@ -23,7 +28,8 @@ def execute_cypher(cypher_query: str) -> str:
     except Exception as e:
         return f"ERROR: {str(e)}"
 
-SCHEMA = open("schema.txt", "r").read()
+SCHEMA_PATH = Path(__file__).resolve().parents[1] / "neo_4j.schema.md"
+SCHEMA = SCHEMA_PATH.read_text(encoding="utf-8")
 
 cypher_system_prompt = f"""You are a Cypher expert for Neo4j.
 
@@ -46,14 +52,13 @@ Always return Just the query + results + one line reasoning.
 Use LIMIT 10 for broad queries unless otherwise specified"""
 def get_cypher_middleware():
     return SubAgentMiddleware(
-        default_model="openai:gpt-4o-mini",
+        default_model=build_openrouter_model(),
         subagents=[
             {
                 "name": "cypher",
                 "description": "Generate + execute Cypher queries on Neo4j and return query+results+reasoning.",
                 "system_prompt": cypher_system_prompt,
                 "tools": [execute_cypher],
-                "model": "openai:gpt-4o-mini",
             },
         ],
     )

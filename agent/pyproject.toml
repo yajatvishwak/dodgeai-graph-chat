@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "deepagents>=0.4.12",
     "langchain-openai>=1.1.12",
+    "langfuse>=4.0.1",
     "neo4j>=6.1.0",
     "python-dotenv>=1.2.2",
 ]
