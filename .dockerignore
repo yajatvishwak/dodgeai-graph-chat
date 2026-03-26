@@ -1,0 +1,11 @@
+.git
+.gitignore
+.cursor
+.venv
+__pycache__
+node_modules
+.svelte-kit
+*.egg-info
+.env
+.DS_Store
+agent-transcripts

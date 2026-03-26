@@ -1,0 +1,7 @@
+.venv
+__pycache__
+*.egg-info
+.env
+uv.lock
+sap-o2c-data
+.DS_Store
