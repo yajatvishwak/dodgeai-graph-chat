@@ -1,0 +1,16 @@
+[project]
+name = "graph-agent-web-server"
+version = "0.1.0"
+description = "FastAPI host for Neo4j graph chat agent"
+requires-python = ">=3.13"
+dependencies = [
+    "deepagents>=0.4.12",
+    "fastapi>=0.116.1",
+    "langchain-openai>=1.1.12",
+    "langfuse>=4.0.1",
+    "neo4j>=6.1.0",
+    "pydantic>=2.11.9",
+    "python-dotenv>=1.2.2",
+    "pyyaml>=6.0.3",
+    "uvicorn>=0.35.0",
+]

@@ -1,0 +1,26 @@
+{
+  "name": "graph-agent-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/kit": "^2.36.2",
+    "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "svelte": "^5.38.2",
+    "svelte-check": "^4.3.1",
+    "typescript": "^5.9.2",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "marked": "^17.0.5",
+    "vis-data": "^7.1.9",
+    "vis-network": "^9.1.13"
+  }
+}

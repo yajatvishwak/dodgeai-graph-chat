@@ -1,67 +1,107 @@
-# Neo4j Schema (12 Nodes)
+# Neo4j Graph Schema — SAP Order-to-Cash
 
-## Nodes & Attributes
+## Node Types
 
-| Node              | Attributes                                                                                                                       |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `Address`         | addressId, street, city, region, country, postalCode, validFrom, validTo                                                         |
-| `BillingDocument` | billingDocumentId, cancelledBillingDocumentId, billingDate, billingType, companyCode, currency, isCancelled, totalNetAmount      |
-| `BillingItem`     | billingDocumentId, billingItemId, billingItemUid, productId, netAmount, quantity                                                 |
-| `Customer`        | customerId, companyCode, currency, distributionChannel, division, fullName, grouping, isBlocked, paymentTerms, salesOrganization |
-| `Delivery`        | deliveryId, deliveryDate, goodsMovementStatus, shippingPoint                                                                     |
-| `DeliveryItem`    | deliveryId, deliveryItemId, deliveryItemUid, plantId, productId                                                                  |
-| `JournalEntry`    | journalEntryId, amountTransactionCurrency, companyCode, fiscalYear                                                               |
-| `Payment`         | paymentId, amountTransactionCurrency, companyCode                                                                                |
-| `Plant`           | plantId, plantName                                                                                                               |
-| `Product`         | productId, productName, productType, profitCenter                                                                                |
-| `SalesOrder`      | salesOrderId, currency, orderDate, totalNetAmount                                                                                |
-| `SalesOrderItem`  | plantId, productId, salesOrderId, salesOrderItemId, salesOrderItemUid, confirmedDeliveryDate, netAmount                          |
+| Label               | Key Property                     | Other Properties                                                                                                                                                                                                                    |
+| ------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Customer            | `id`                             | fullName, name, companyCode, isBlocked, salesOrganization, distributionChannel, currency, paymentTerms, grouping, category, industry, creationDate, reconciliationAccount, customerAccountGroup                                     |
+| Address             | `id` (businessPartner:addressId) | businessPartner, addressId, city, country, postalCode, region, street                                                                                                                                                               |
+| Product             | `id`                             | name, type, group, baseUnit, division, grossWeight, netWeight, weightUnit, creationDate                                                                                                                                             |
+| Plant               | `id`                             | name, salesOrganization, distributionChannel, division                                                                                                                                                                              |
+| SalesOrder          | `id`                             | type, salesOrganization, distributionChannel, division, creationDate, totalNetAmount, currency, deliveryStatus, billingStatus, soldToParty, paymentTerms, requestedDeliveryDate, incotermsClassification, incotermsLocation         |
+| SalesOrderItem      | `uid` (salesOrder:item)          | salesOrder, item, category, material, quantity, quantityUnit, netAmount, currency, materialGroup, plant, storageLocation, confirmedDeliveryDate, confirmedQuantity                                                                  |
+| Delivery            | `id`                             | creationDate, actualGoodsMovementDate, shippingPoint, goodsMovementStatus, pickingStatus, deliveryBlockReason                                                                                                                       |
+| DeliveryItem        | `uid` (deliveryDoc:item)         | deliveryDocument, item, quantity, quantityUnit, plant, storageLocation, batch, referenceSalesOrder, referenceSalesOrderItem                                                                                                         |
+| BillingDocument     | `id`                             | type, date, creationDate, totalNetAmount, currency, companyCode, isCancelled, cancelledBillingDocument, accountingDocument, fiscalYear, soldToParty                                                                                 |
+| BillingDocumentItem | `uid` (billingDoc:item)          | billingDocument, item, material, quantity, quantityUnit, netAmount, currency, referenceDelivery, referenceDeliveryItem                                                                                                              |
+| JournalEntry        | `id` (accountingDoc:fiscalYear)  | accountingDocument, fiscalYear, companyCode, documentType, postingDate, documentDate, referenceDocument, customer, profitCenter, currency, glAccount, totalAmount, clearingDate, clearingDocument, clearingDocFiscalYear, itemCount |
+| ClearingDocument    | `id` (clearingDoc:fiscalYear)    | accountingDocument, fiscalYear, clearingDate, customer, companyCode                                                                                                                                                                 |
 
 ## Relationships
 
+### Document-level OTC flow (use these for tracing)
+
 ```
-BillingDocument -[:HAS_BILLING_ITEM]-----> BillingItem
-BillingDocument -[:INVOICES]-------------> Product
-BillingItem     -[:REFERENCES_PRODUCT]---> Product
-Customer        -[:BILLED_TO]------------> BillingDocument
-Customer        -[:HAS_ADDRESS]----------> Address
-Customer        -[:HAS_JOURNAL_ENTRY]----> JournalEntry
-Customer        -[:MADE_PAYMENT]---------> Payment
-Customer        -[:PLACED]---------------> SalesOrder
-Delivery        -[:DISPATCHED_FROM]------> Plant
-Delivery        -[:FULFILLS]-------------> SalesOrder
-Delivery        -[:HAS_DELIVERY_ITEM]----> DeliveryItem
-Delivery        -[:SHIPS]----------------> Product
-DeliveryItem    -[:REFERENCES_PLANT]-----> Plant
-DeliveryItem    -[:REFERENCES_PRODUCT]---> Product
-JournalEntry    -[:RECORDS]--------------> BillingDocument
-Product         -[:STOCKED_AT]-----------> Plant
-SalesOrder      -[:HAS_SALE_ITEM]--------> SalesOrderItem
-SalesOrder      -[:INCLUDES]-------------> Product
-SalesOrder      -[:SOURCED_FROM]---------> Plant
-SalesOrderItem  -[:REFERENCES_PLANT]-----> Plant
-SalesOrderItem  -[:REFERENCES_PRODUCT]---> Product
+(Customer)-[:PLACED]->(SalesOrder)
+(SalesOrder)-[:DELIVERED_VIA]->(Delivery)
+(Delivery)-[:BILLED_IN]->(BillingDocument)
+(BillingDocument)-[:RECORDED_AS]->(JournalEntry)
+(JournalEntry)-[:CLEARED_BY]->(ClearingDocument)
 ```
 
-## IDENTITY MAP (CRITICAL)
+### Customer links
 
-Each node has a unique identifier property:
+```
+(BillingDocument)-[:BILLED_TO]->(Customer)
+(JournalEntry)-[:FOR_CUSTOMER]->(Customer)
+(ClearingDocument)-[:FOR_CUSTOMER]->(Customer)
+(Customer)-[:HAS_ADDRESS]->(Address)
+```
 
-- Address → addressId
-- BillingDocument → billingDocumentId
-- BillingItem → billingItemId
-- Customer → customerId
-- Delivery → deliveryId
-- DeliveryItem → deliveryItemId
-- JournalEntry → journalEntryId
-- Payment → paymentId
-- Plant → plantId
-- Product → productId
-- SalesOrder → salesOrderId
-- SalesOrderItem → salesOrderItemId
+### Item containment
 
-IMPORTANT:
+```
+(SalesOrder)-[:HAS_ITEM]->(SalesOrderItem)
+(Delivery)-[:HAS_ITEM]->(DeliveryItem)
+(BillingDocument)-[:HAS_ITEM]->(BillingDocumentItem)
+```
 
-- IDs are NOT interchangeable across node types
-- Same numeric value may appear in multiple node types
-- You MUST validate which node actually exists before using it
+### Item-level flow (for granular tracing)
+
+```
+(DeliveryItem)-[:FULFILLS]->(SalesOrderItem)
+(BillingDocumentItem)-[:BILLS]->(DeliveryItem)
+```
+
+### Product / master data
+
+```
+(SalesOrderItem)-[:FOR_PRODUCT]->(Product)
+(BillingDocumentItem)-[:FOR_PRODUCT]->(Product)
+(SalesOrderItem)-[:FROM_PLANT]->(Plant)
+(DeliveryItem)-[:FROM_PLANT]->(Plant)
+(Product)-[:AVAILABLE_AT]->(Plant)
+(Product)-[:STORED_AT]->(Plant)          // has storageLocation property on relationship
+```
+
+### Cancellation
+
+```
+(BillingDocument)-[:CANCELS]->(BillingDocument)  // only if cancelledBillingDocument is populated
+```
+
+## Document Flow Diagram
+
+```
+Customer ─PLACED─► SalesOrder ─DELIVERED_VIA─► Delivery ─BILLED_IN─► BillingDocument ─RECORDED_AS─► JournalEntry ─CLEARED_BY─► ClearingDocument
+```
+
+Item-level (reverse direction):
+
+```
+SalesOrderItem ◄─FULFILLS─ DeliveryItem ◄─BILLS─ BillingDocumentItem
+```
+
+## ID Formats
+
+| Document            | ID Pattern               | Example          |
+| ------------------- | ------------------------ | ---------------- |
+| Sales Order         | 6-digit 740xxx           | `740506`         |
+| Delivery            | 8-digit 807xxxxx         | `80737721`       |
+| Billing Document    | 8-digit 905/906/911xxxxx | `90504298`       |
+| Accounting Doc (JE) | 10-digit 9400000xxx      | `9400000220`     |
+| Clearing Doc        | 10-digit 9400635xxx      | `9400635977`     |
+| Customer            | 9-digit 310/320xxxxxx    | `310000108`      |
+| Product             | variable S89/B89/numeric | `S8907367001003` |
+| Plant               | 4-char                   | `1920`, `KA05`   |
+
+## Key Data Caveats
+
+- All IDs are stored as **strings**.
+- Item UIDs use `:` as separator: `740506:10`, `80738076:10`, `9400000220:2025`.
+- Item numbers are normalised (leading zeros stripped): `000010` → `10`.
+- `isCancelled` boolean on BillingDocument marks cancelled invoices. The `cancelledBillingDocument` field is empty in this dataset so `CANCELS` relationships may not exist.
+- Currency is `INR` and company code is `ABCD` for all records.
+- Dates are ISO-8601 strings: `2025-04-02T00:00:00Z`.
+- `totalNetAmount` on SalesOrder and BillingDocument is a float. `totalAmount` on JournalEntry is a float.
+- Use `OPTIONAL MATCH` for flow traversals to handle incomplete chains.

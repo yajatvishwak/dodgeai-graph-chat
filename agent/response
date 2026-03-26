@@ -1,0 +1,20 @@
+```yaml
+message: "The analysis of sales orders reveals the following broken or incomplete flows:
+
+1. **Delivered but not billed**: The following sales orders have been delivered (via a `FULFILLS` relationship) but do not have an associated billing document for the customer who placed the order:
+   - 740506
+   - 740507
+   - 740508
+
+2. **Billed but not delivered**: There are no sales orders in the database that have been billed (via a customer's `BILLED_TO` relationship) but lack a corresponding delivery."
+todos:
+- content: Identify sales orders that are delivered but not billed.
+  status: completed
+- content: Identify sales orders that are billed but not delivered.
+  status: completed
+cypher_queries:
+- "MATCH (so:SalesOrder) WHERE EXISTS { (d:Delivery)-[:FULFILLS]->(so) } AND NOT EXISTS { MATCH (c:Customer)-[:PLACED]->(so) MATCH (c)-[:BILLED_TO]->(bd:BillingDocument) } RETURN so.salesOrderId AS SalesOrderId LIMIT 10"
+- "MATCH (c:Customer)-[:PLACED]->(so:SalesOrder) MATCH (c)-[:BILLED_TO]->(bd:BillingDocument) WHERE NOT (so)<-[:FULFILLS]-(:Delivery) RETURN DISTINCT so.salesOrderId AS SalesOrderId, so.orderDate AS OrderDate, so.totalNetAmount AS TotalNetAmount LIMIT 10"
+confidence: 1
+confidence_rationale: The queries directly address the definitions of "delivered but not billed" and "billed but not delivered" based on the provided schema and relationships. The results are consistent with the graph data.
+```

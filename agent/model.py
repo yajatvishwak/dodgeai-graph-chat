@@ -11,7 +11,7 @@ def build_openrouter_model() -> ChatOpenAI:
     if not api_key:
         raise RuntimeError("Missing OPENROUTER_API_KEY environment variable.")
 
-    model_name = os.environ.get("OPENROUTER_MODEL", "google/gemini-3.1-flash-lite-preview")
+    model_name = os.environ.get("OPENROUTER_MODEL", "xiaomi/mimo-v2-pro")
     base_url = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
     temperature = float(os.environ.get("OPENROUTER_TEMPERATURE", "0"))
 

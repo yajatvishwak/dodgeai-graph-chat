@@ -1,131 +1,119 @@
-graph model
+Graph Model Design
 
-customer
-(from bp + company assign + sales area)
-customerid pk
-fullname
-grouping
-industry
-isblocked
-companycode
-salesorg
-distributionchannel
-division
-paymentterms
-currency
+Nodes (11 types)
 
-address
-addressid pk
-city
-country
-postalcode
-region
-street
-validfrom
-validto
+Node Label
 
-product
-(products + desc en + plants)
-productid pk
-productname (flattened)
-producttype
-profitcenter
+Source Dataset
 
-plant
-plantid pk
-plantname
+Primary Key
 
-sales order
+Customer
 
-salesorderid pk
-orderdate
-totalnetamount
-currency
+business_partners
 
-items
-salesorderitemid
-productid
-plantid
-netamount
-confirmeddeliverydate
+id (= customer field)
 
-delivery
+Product
 
-deliveryid pk
-deliverydate
-shippingpoint
-goodsmovementstatus
+products + product_descriptions
 
-items
-deliveryitemid
-productid
-plantid
+id (= product field)
 
-billing document
+Plant
 
-billingdocumentid pk
-billingdate
-billingtype
-companycode
-currency
-totalnetamount
-iscancelled
-cancelledbillingdocumentid
+plants
 
-items
-billingitemid
-productid
-quantity
-netamount
+id (= plant field)
 
-journal entry
+SalesOrder
 
-journalentryid (doc + fiscalyear)
-companycode
-fiscalyear
-amounttransactioncurrency
+sales_order_headers
 
-payment
+id (= salesOrder)
 
-paymentid (doc only)
-companycode
-amounttransactioncurrency
+SalesOrderItem
 
-customer has address
-customer placed salesorder
-customer billed to billingdocument
-customer has journalentry
-customer made payment
+sales_order_items
 
-salesorder includes product
-salesorder sourced from plant
+uid (salesOrder:item)
 
-delivery fulfills salesorder
-delivery ships product
-delivery from plant
+Delivery
 
-billingdocument bills for salesorder
-billingdocument invoices product
-billingdocument cancels billingdocument
+outbound_delivery_headers
 
-journalentry records billingdocument
-payment settles billingdocument
+id (= deliveryDocument)
 
-product stocked at plant
+DeliveryItem
 
-customer salesorder (1)
-salesorder product (1)
-salesorder billing (1)
-customer billing (1)
+outbound_delivery_items
 
-billing payment (1)
+uid (deliveryDoc:item normalized)
 
-customer salesorder plant (2)
+BillingDocument
 
-product plant (1)
+billing_document_headers + cancellations
 
-salesorder delivery (1)
+id (= billingDocument)
 
-customer salesorder delivery product (3)
+BillingDocumentItem
 
-customer salesorder billing journal (3)
+billing_document_items
+
+uid (billingDoc:item)
+
+JournalEntry
+
+journal_entry_items (aggregated by doc)
+
+id (accountingDoc:fiscalYear)
+
+ClearingDocument
+
+clearing refs from journal_entry_items
+
+id (clearingDoc:fiscalYear)
+
+Relationships (17 types)
+
+Document-level flow (1-2 hop traversal):
+
+(Customer)-[:PLACED]->(SalesOrder) -- via soldToParty
+
+(SalesOrder)-[:DELIVERED_VIA]->(Delivery) -- derived from delivery items
+
+(Delivery)-[:BILLED_IN]->(BillingDocument) -- derived from billing items
+
+(BillingDocument)-[:RECORDED_AS]->(JournalEntry) -- via accountingDocument/referenceDocument
+
+(BillingDocument)-[:BILLED_TO]->(Customer) -- via soldToParty
+
+(JournalEntry)-[:CLEARED_BY]->(ClearingDocument) -- via clearingAccountingDocument
+
+Item containment:
+
+(SalesOrder)-[:HAS_ITEM]->(SalesOrderItem)
+
+(Delivery)-[:HAS_ITEM]->(DeliveryItem)
+
+(BillingDocument)-[:HAS_ITEM]->(BillingDocumentItem)
+
+Item-level flow (precise tracing):
+
+(DeliveryItem)-[:FULFILLS]->(SalesOrderItem) -- via referenceSdDocument + item (normalized)
+
+(BillingDocumentItem)-[:BILLS]->(DeliveryItem) -- via referenceSdDocument + item (normalized)
+
+Product/Master data:
+
+(SalesOrderItem)-[:FOR_PRODUCT]->(Product)
+
+(BillingDocumentItem)-[:FOR_PRODUCT]->(Product)
+
+(SalesOrderItem)-[:FROM_PLANT]->(Plant)
+
+(DeliveryItem)-[:FROM_PLANT]->(Plant)
+
+(Product)-[:AVAILABLE_AT]->(Plant) -- from product_plants
+
+(Customer)-[:HAS_ADDRESS]->(Address) -- optional, from business_partner_addresses

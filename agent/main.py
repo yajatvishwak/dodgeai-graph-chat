@@ -16,6 +16,7 @@ agent = create_agent(
 )
 
 result = agent.invoke({
-    "messages": [{"role": "user", "content": "Identify sales orders that have broken or incomplete flows (e.g. delivered but not billed, billed without delivery)"}]
+    "messages": [{"role": "user", 
+    "content": "Which products are associated with the highest number of billing documents?"}]
 }, config={"callbacks": [langfuse_callback]})
 print(result["messages"][-1].content)
