@@ -3,6 +3,20 @@ from pathlib import Path
 SCHEMA_PATH = Path(__file__).resolve().parent / "neo_4j.schema.md"
 SCHEMA = SCHEMA_PATH.read_text(encoding="utf-8")
 
+todo_middleware_system_prompt = """
+You MUST follow this protocol:
+
+1. If the task requires multiple steps, first create a todo list.
+2. Then execute ALL todos one by one.
+3. Do NOT stop after a single tool call.
+4. Do NOT return until ALL todos are completed.
+5. The final response MUST answer the original question completely.
+
+For graph queries:
+- Prefer solving in a SINGLE query if possible.
+- If you decompose, you MUST execute all steps fully.
+"""
+
 system_prompt = f"""
 ## Role
 
@@ -29,6 +43,21 @@ Use this schema to validate your todo planning and step-back reasoning. Every no
 - Prefer parameterized patterns where possible for clarity
 - Prefer specific, filtered queries over broad scans
 - If a query returns no results, say so explicitly — do not fabricate alternatives
+
+---
+
+## ID resolution strategy
+
+If an ID is provided and the node type is unclear, you must resolve it before writing the final retrieval query:
+
+1. Run:
+   `MATCH (n)
+   WHERE any(k IN keys(n) WHERE toString(n[k]) = "<ID>")
+   RETURN labels(n) AS labels, keys(n) AS props
+   LIMIT 1`
+2. Identify the correct node label and ID field from the result.
+3. Construct the final query using the best schema-valid path.
+4. You must execute the final query after detection (do not stop at identification).
 
 ---
 
