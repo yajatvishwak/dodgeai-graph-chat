@@ -1,12 +1,14 @@
-.venv/
+# Local environment
 .env
+.venv/
+
+# Python cache/build artifacts
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.pyw
-*.pyz
-*.pywz
-*.pyzw
-*.pyzwz
+*.py[cod]
+build/
+dist/
+wheels/
+*.egg-info/
+
+# OS files
 .DS_Store
